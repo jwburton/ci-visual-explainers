@@ -1,0 +1,482 @@
+<!doctype html>
+<title>Condorcet's Jury Theorem</title>
+<style>
+  :root{
+    --page:   #ffffff;
+    --ink:    #000000;
+    --ink-2:  #7F7F7F;
+    --muted:  #AEAEAE;
+    --hair:   #E2E2E2;
+    color-scheme: light;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--page);
+    color:var(--ink);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight:300;
+  }
+  b, strong{ font-weight:700; }
+
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- hero (minimal title) ---------- */
+  .hero{
+    padding:44px 40px 32px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .hero .kicker{ margin:0; font-size:13px; color:var(--ink-2); font-weight:300; }
+  .hero h1{
+    margin:0;
+    font-weight:700;
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.2;
+    letter-spacing:-.01em;
+    padding-bottom:16px;
+    border-bottom:2px solid var(--ink);
+  }
+  .thesis{
+    margin:2px 0 0;
+    font-size:clamp(16px,2.2vw,19px);
+    font-weight:300;
+    color:var(--ink);
+  }
+
+  /* ---------- formal notation (reused idiom) ---------- */
+  .notation{
+    margin:14px 0 0;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(17px,2.3vw,21px);
+    color:var(--ink);
+  }
+  .notation .op{ padding:0 .3em; }
+  .notation i{ font-style:italic; }
+  .notation .sigma{
+    display:inline-flex; flex-direction:column; align-items:center;
+    line-height:.9; margin:0 .12em;
+  }
+  .notation .sigma .lim{ font-size:.32em; font-style:italic; line-height:1.3; }
+  .notation .sigma .sym{ font-size:1.55em; line-height:.7; }
+  .notation .choose{ display:inline-flex; align-items:center; margin:0 .08em; }
+  .notation .choose .paren{ font-size:1.35em; line-height:.7; }
+  .notation .choose .stack{
+    display:inline-flex; flex-direction:column; align-items:center;
+    font-size:.55em; line-height:1.15; margin:0 .12em;
+  }
+  .notation-key{
+    margin:10px 0 0;
+    font-size:12px;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+  .notation-key i{ font-style:italic; }
+  .hero-note{
+    margin:12px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--ink-2);
+  }
+
+  /* ---------- generic section shell ---------- */
+  section{ padding:36px 40px; border-bottom:1px solid var(--hair); }
+  section:last-of-type{ border-bottom:none; }
+
+  .history p{ margin:0 0 12px; max-width:66ch; font-size:16px; line-height:1.7; color:var(--ink); }
+  .history p:last-child{ margin-bottom:0; }
+  .history .cite{ display:block; margin-top:10px; font-size:12.5px; color:var(--ink-2); }
+
+  .section-head{ margin-bottom:8px; }
+  .section-head h2{
+    margin:0 0 12px;
+    font-size:22px;
+    font-weight:700;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--ink);
+  }
+  .section-head p{
+    margin:14px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+
+  /* ---------- lab ---------- */
+  .lab-grid{
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:36px;
+    align-items:start;
+    margin-top:26px;
+  }
+  @media (max-width:680px){ .lab-grid{ grid-template-columns:1fr; } }
+
+  .controls{ display:flex; flex-direction:column; gap:22px; }
+  .control{ display:flex; flex-direction:column; gap:7px; }
+  .control .row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .control label{ font-size:12.5px; font-weight:700; color:var(--ink); }
+  .control .val{ font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .control .hint{ font-size:11.5px; color:var(--muted); line-height:1.45; font-weight:300; }
+
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:1px;
+    background:var(--ink);
+    outline-offset:4px;
+    margin:10px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink);
+    cursor:pointer;
+    margin-top:0;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink); border:none; cursor:pointer;
+  }
+  input[type="range"]:focus-visible{ outline:2px solid var(--ink); }
+
+  #newJury{
+    margin-top:2px;
+    align-self:flex-start;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--ink);
+    border-radius:0;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  #newJury:hover{ background:var(--ink); color:#fff; }
+  #newJury:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+
+  .legend{
+    display:flex; flex-direction:column; gap:9px;
+    margin-top:8px;
+    padding-top:18px;
+    border-top:1px solid var(--hair);
+  }
+  .legend-item{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-2); font-weight:300; }
+  .mark{ flex:none; }
+  .mark.line{ width:18px; height:0; border-top:2.5px solid var(--ink); }
+  .mark.dash{ width:18px; height:0; border-top:1.5px dashed rgba(0,0,0,0.45); }
+  .mark.sqf{ width:9px; height:9px; border:1.5px solid var(--ink); background:var(--ink); }
+  .mark.sqo{ width:9px; height:9px; border:1.5px solid var(--ink); background:#fff; }
+
+  .chart-wrap{ display:flex; flex-direction:column; gap:2px; }
+  #chart{ width:100%; height:auto; display:block; }
+  .axis-caption{ text-align:center; font-size:11px; color:var(--muted); margin-top:4px; font-weight:300; }
+
+  .jury-grid{ display:flex; flex-wrap:wrap; gap:3px; margin-top:22px; }
+  .jury-cell{ width:14px; height:14px; flex:none; border:1px solid var(--hair); background:#fff; }
+  .jury-cell.correct{ background:var(--ink); border-color:var(--ink); }
+  .jury-sub{ margin:8px 0 0; font-size:12px; color:var(--ink-2); font-weight:300; }
+
+  /* ---------- compare row (stat tiles) ---------- */
+  .compare-row{
+    margin-top:26px;
+    padding-top:16px;
+    border-top:1px solid var(--ink);
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+  }
+  @media (max-width:560px){ .compare-row{ flex-direction:column; gap:16px; } }
+  .stat-tile{ flex:1; display:flex; flex-direction:column; gap:5px; }
+  .stat-tile + .stat-tile{ border-left:1px solid var(--hair); padding-left:20px; margin-left:20px; }
+  @media (max-width:560px){ .stat-tile + .stat-tile{ border-left:none; padding-left:0; margin-left:0; } }
+  .stat-tile .stat-label{ font-size:12px; color:var(--ink); font-weight:700; }
+  .stat-tile .stat-value{ font-size:clamp(20px,3vw,25px); font-weight:700; }
+  .stat-tile .stat-sub{ font-size:11.5px; color:var(--ink-2); line-height:1.4; font-weight:300; }
+
+  /* ---------- takeaways ---------- */
+  .takeaways{ display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:22px; }
+  @media (max-width:600px){ .takeaways{ grid-template-columns:1fr; gap:24px; } }
+  .takeaway{ padding-top:14px; border-top:1px solid var(--ink); }
+  .takeaway h3{ margin:0 0 8px; font-size:16px; font-weight:700; }
+  .takeaway p{ margin:0; font-size:14px; line-height:1.62; color:var(--ink-2); font-weight:300; }
+
+  footer{ padding:26px 40px 40px; display:flex; flex-direction:column; gap:5px; }
+  footer p{ margin:0; font-size:11.5px; line-height:1.6; color:var(--muted); font-weight:300; }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <h1>Condorcet&rsquo;s jury theorem</h1>
+    <p class="thesis">A group's majority vote on a binary outcome becomes more reliable than any single member of it as the group size increases, as long as each member is at least a little better than a coin flip.</p>
+    <p class="notation">
+      P(majority correct) <span class="op">=</span>
+      <span class="sigma"><span class="lim">N</span><span class="sym">&Sigma;</span><span class="lim">k=m</span></span>
+      <span class="choose"><span class="paren">(</span><span class="stack"><i>N</i><i>k</i></span><span class="paren">)</span></span>
+      <i>p</i><sup><i>k</i></sup>(1&minus;<i>p</i>)<sup><i>N</i>&minus;<i>k</i></sup>
+    </p>
+    <p class="notation-key"><i>N</i> = jury size &middot; <i>p</i> = each juror&rsquo;s independent chance of voting correctly &middot; <i>m</i> = votes needed for a majority &middot; <i>k</i> = number of correct votes</p>
+    <p class="hero-note">Nicolas de Condorcet proved this in 1785, arguing for majority rule in revolutionary France's assemblies and courts. 
+      The proof assumes every juror decides independently and is equally likely to be right every time.</p>
+  </header>
+
+  <section class="history">
+    <p>Imagine a jury deciding whether a defendant is guilty. None of them knows the correct answer with certainty. Each juror is really just an informed guesser, right some percentage of the time and wrong the rest. Condorcet's question was: if you know how good each juror's judgment is on its own, how good is the jury's <em>majority verdict</em>?</p>
+    <p>What this theorem shows is that if every juror is even slightly better than a coin flip (i.e., independently accurate >50% of the time), a large enough jury's majority verdict is most likely correct. Accuracy climbs toward certainty as the jury grows, no matter how mediocre any single juror is. If you flip that one assumption and make individual jurors worse than a coin flip, then adding more of them makes the majority more likely to be wrong. 
+      If jurors are exactly as good as a coin flip, no jury size ever helps: the majority is just noise.</p>
+    <span class="cite">Condorcet, N. de (1785). <em>Essai sur l'application de l'analyse &agrave; la probabilit&eacute; des d&eacute;cisions rendues &agrave; la pluralit&eacute; des voix.</em> Paris.</span>
+  </section>
+
+  <section class="lab" id="lab">
+    <div class="section-head">
+      <h2>Swear in a jury</h2>
+      <p>Set how good each juror is on their own, and how many jurors sit on the panel. The defendant is, unknown to the jury, actually guilty.</p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="controls">
+        <div class="control">
+          <div class="row"><label for="pSlider">Individual competence</label><span class="val" id="pVal">60%</span></div>
+          <input type="range" id="pSlider" min="10" max="90" step="1" value="60">
+          <p class="hint">Each juror's own independent chance of voting correctly.</p>
+        </div>
+        <div class="control">
+          <div class="row"><label for="nSlider">Jury size</label><span class="val" id="nVal">25</span></div>
+          <input type="range" id="nSlider" min="1" max="101" step="2" value="25">
+          <p class="hint">How many jurors sit on the panel. Kept odd, so the majority is never a tie.</p>
+        </div>
+        <button id="newJury" type="button">Swear in a new jury</button>
+
+        <div class="legend">
+          <div class="legend-item"><span class="mark sqf"></span>Juror voted correctly</div>
+          <div class="legend-item"><span class="mark sqo"></span>Juror voted incorrectly</div>
+          <div class="legend-item"><span class="mark line"></span>Majority accuracy (theory)</div>
+          <div class="legend-item"><span class="mark dash"></span>Chance (coin flip)</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="chart" role="img" aria-label="Probability the jury's majority verdict is correct, as a function of jury size, for the current individual competence"></canvas>
+        <p class="axis-caption">Jury size (N) &rarr;</p>
+
+        <div class="jury-grid" id="juryGrid"></div>
+        <p class="jury-sub" id="jurySub">&mdash;</p>
+      </div>
+    </div>
+
+    <div class="compare-row" aria-live="polite">
+      <div class="stat-tile">
+        <span class="stat-label">This jury&rsquo;s verdict</span>
+        <span class="stat-value" id="statVerdict">&mdash;</span>
+        <span class="stat-sub" id="statVerdictSub">Majority vote versus the true answer.</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Theoretical accuracy</span>
+        <span class="stat-value" id="statTheory">0%</span>
+        <span class="stat-sub" id="statTheorySub">Exact probability the majority is correct, at this N and p.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <div class="takeaway">
+      <h3>More jurors helps &mdash; only above the coin-flip line</h3>
+      <p>Adding jurors doesn&rsquo;t make a jury smarter by itself. It amplifies whatever tendency is already there: push competence just above 50% and the majority converges towards the truth; push it just below 50% and the majority converges just as fast on being wrong.</p>
+    </div>
+    <div class="takeaway">
+      <h3>Independence is doing all the work</h3>
+      <p>The theorem needs every juror's error to be its own, uncorrelated mistake. But in reality, jurors talk, defer to confident voices, and share the same news coverage and biases. Correlated errors don't cancel out the way independent ones do, no matter how many jurors you add (Ladha, 1992).</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>References.</p>
+    <p>Condorcet, N. de (1785). <em>Essai sur l'application de l'analyse &agrave; la probabilit&eacute; des d&eacute;cisions rendues &agrave; la pluralit&eacute; des voix.</em> Paris. &middot; Ladha, K. K. (1992). The Condorcet Jury Theorem, free speech, and correlated votes. <em>American Journal of Political Science</em>, 36(3), 617&ndash;634.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const N_MAX = 101;
+
+  const pSlider = document.getElementById('pSlider');
+  const nSlider = document.getElementById('nSlider');
+  const pVal = document.getElementById('pVal');
+  const nVal = document.getElementById('nVal');
+  const chart = document.getElementById('chart');
+  const juryGrid = document.getElementById('juryGrid');
+  const jurySub = document.getElementById('jurySub');
+
+  let lastJury = null; // { votes: [bool correct], n, p, correctCount, majorityCorrect }
+
+  // P(at least m of N independent trials succeed with prob p), via stable recurrence
+  function majorityProb(n, p){
+    const m = Math.floor(n/2) + 1;
+    let term = Math.pow(1-p, n); // P(k=0)
+    let cum = 0;
+    for(let k=0; k<=n; k++){
+      if(k >= m) cum += term;
+      if(k < n) term = term * (n-k)/(k+1) * (p/(1-p));
+    }
+    return cum;
+  }
+
+  function curvePoints(p){
+    const pts = [];
+    for(let n=1; n<=N_MAX; n+=2) pts.push({ n, prob: majorityProb(n, p) });
+    return pts;
+  }
+
+  function newJury(){
+    const n = +nSlider.value, p = +pSlider.value/100;
+    const votes = [];
+    for(let i=0;i<n;i++) votes.push(Math.random() < p);
+    const correctCount = votes.filter(Boolean).length;
+    const majorityCorrect = correctCount > n/2;
+    lastJury = { votes, n, p, correctCount, majorityCorrect };
+    refreshUI();
+  }
+
+  function renderJuryGrid(){
+    juryGrid.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    lastJury.votes.forEach(v=>{
+      const cell = document.createElement('div');
+      cell.className = 'jury-cell' + (v ? ' correct' : '');
+      frag.appendChild(cell);
+    });
+    juryGrid.appendChild(frag);
+    jurySub.textContent = lastJury.correctCount + ' of ' + lastJury.n + ' jurors voted correctly.';
+  }
+
+  function updateStats(){
+    document.getElementById('statVerdict').textContent = lastJury.majorityCorrect ? 'Correct' : 'Incorrect';
+    document.getElementById('statVerdictSub').textContent = lastJury.correctCount + ' of ' + lastJury.n + ' voted guilty (the true verdict) — majority ' + (lastJury.majorityCorrect ? 'correct.' : 'incorrect.');
+    const theory = majorityProb(lastJury.n, lastJury.p);
+    document.getElementById('statTheory').textContent = Math.round(theory*100) + '%';
+    document.getElementById('statTheorySub').textContent = 'At N=' + lastJury.n + ', p=' + Math.round(lastJury.p*100) + '%.';
+  }
+
+  // ---------------- chart ----------------
+  const PAD_L = 44, PAD_R = 16, PAD_T = 20, PAD_B = 34;
+
+  function sizeCanvas(cv, cssW, cssH){
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(cssW*dpr);
+    cv.height = Math.round(cssH*dpr);
+    cv.style.width = cssW+'px';
+    cv.style.height = cssH+'px';
+    const c = cv.getContext('2d');
+    c.setTransform(dpr,0,0,dpr,0,0);
+    return c;
+  }
+
+  function redrawChart(){
+    const cssW = chart.parentElement.clientWidth;
+    const cssH = Math.round(cssW * (320/640));
+    const c = sizeCanvas(chart, cssW, cssH);
+    const plotW = cssW-PAD_L-PAD_R, plotH = cssH-PAD_T-PAD_B;
+    c.clearRect(0,0,cssW,cssH);
+
+    const p = +pSlider.value/100;
+    const n = +nSlider.value;
+    const pts = curvePoints(p);
+
+    const xOf = (nn) => PAD_L + (nn-1)/(N_MAX-1) * plotW;
+    const yOf = (pct) => PAD_T + plotH - (pct/100) * plotH;
+
+    // y gridlines + labels
+    c.font = '11px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    [0,25,50,75,100].forEach(v=>{
+      const y = yOf(v);
+      c.fillStyle = '#AEAEAE';
+      c.fillText(v, PAD_L-8, y);
+      c.strokeStyle = '#E2E2E2'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(PAD_L,y); c.lineTo(PAD_L+plotW,y); c.stroke();
+    });
+    // x ticks
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    [1,25,50,75,101].forEach(v=>{
+      const x = xOf(v);
+      c.fillStyle = '#AEAEAE';
+      c.fillText(v, x, PAD_T+plotH+8);
+    });
+    c.strokeStyle = '#000000'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(PAD_L, PAD_T+plotH); c.lineTo(PAD_L+plotW, PAD_T+plotH); c.stroke();
+    c.beginPath(); c.moveTo(PAD_L, PAD_T); c.lineTo(PAD_L, PAD_T+plotH); c.stroke();
+
+    // reference line: chance (50%)
+    const y50 = yOf(50);
+    c.strokeStyle = 'rgba(0,0,0,0.4)'; c.lineWidth = 1.5;
+    c.setLineDash([3,3]);
+    c.beginPath(); c.moveTo(PAD_L,y50); c.lineTo(PAD_L+plotW,y50); c.stroke();
+    c.setLineDash([]);
+    c.fillStyle = '#7F7F7F';
+    c.font = '10.5px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.textAlign = 'left'; c.textBaseline = 'bottom';
+    c.fillText('Chance — 50%', PAD_L+6, y50-4);
+
+    // main curve
+    c.strokeStyle = '#000000'; c.lineWidth = 2.4;
+    c.beginPath();
+    pts.forEach((pt,i)=>{
+      const x = xOf(pt.n), y = yOf(pt.prob*100);
+      if(i===0) c.moveTo(x,y); else c.lineTo(x,y);
+    });
+    c.stroke();
+
+    // current-N marker
+    const curProb = majorityProb(n, p);
+    const mx = xOf(n), my = yOf(curProb*100);
+    c.fillStyle = '#000000';
+    c.beginPath(); c.arc(mx, my, 4, 0, 7); c.fill();
+    c.strokeStyle = '#ffffff'; c.lineWidth = 1.5;
+    c.beginPath(); c.arc(mx, my, 4, 0, 7); c.stroke();
+
+    c.font = 'bold 12px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.fillStyle = '#000000';
+    c.textAlign = mx > cssW*0.72 ? 'right' : 'left';
+    c.textBaseline = my > cssH*0.5 ? 'bottom' : 'top';
+    c.fillText('N='+n+': '+Math.round(curProb*100)+'%', mx + (mx>cssW*0.72?-9:9), my + (my>cssH*0.5?-9:9));
+  }
+
+  function refreshUI(){
+    renderJuryGrid();
+    updateStats();
+    redrawChart();
+  }
+
+  pSlider.addEventListener('input', function(){
+    pVal.textContent = this.value + '%';
+    newJury();
+  });
+  nSlider.addEventListener('input', function(){
+    nVal.textContent = this.value;
+    newJury();
+  });
+  document.getElementById('newJury').addEventListener('click', newJury);
+
+  let resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(redrawChart, 120);
+  });
+
+  newJury();
+})();
+</script>

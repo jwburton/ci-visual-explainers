@@ -1,0 +1,819 @@
+<!doctype html>
+<title>Diversity Trumps Ability</title>
+<style>
+  :root{
+    --page:   #ffffff;
+    --ink:    #000000;
+    --ink-2:  #7F7F7F;
+    --muted:  #AEAEAE;
+    --hair:   #E2E2E2;
+    color-scheme: light;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--page);
+    color:var(--ink);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight:300;
+  }
+  b, strong{ font-weight:700; }
+
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- hero (minimal title) ---------- */
+  .hero{
+    padding:44px 40px 32px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .hero .kicker{ margin:0; font-size:13px; color:var(--ink-2); font-weight:300; }
+  .hero h1{
+    margin:0;
+    font-weight:700;
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.2;
+    letter-spacing:-.01em;
+    padding-bottom:16px;
+    border-bottom:2px solid var(--ink);
+  }
+  .thesis{
+    margin:2px 0 0;
+    font-size:clamp(16px,2.2vw,19px);
+    font-weight:300;
+    color:var(--ink);
+  }
+  .model-key{
+    margin:12px 0 0;
+    font-size:12px;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+  .model-key i{ font-style:italic; }
+  .hero-note{
+    margin:12px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--ink-2);
+  }
+
+  /* ---------- generic section shell ---------- */
+  section{ padding:36px 40px; border-bottom:1px solid var(--hair); }
+  section:last-of-type{ border-bottom:none; }
+
+  .history p{
+    margin:0 0 12px;
+    max-width:66ch;
+    font-size:16px;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .history p:last-child{ margin-bottom:0; }
+  .history .cite{ display:block; margin-top:10px; font-size:12.5px; color:var(--ink-2); }
+
+  .section-head{ margin-bottom:8px; }
+  .section-head h2{
+    margin:0 0 12px;
+    font-size:22px;
+    font-weight:700;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--ink);
+  }
+  .section-head p{
+    margin:14px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+
+  /* ---------- lab ---------- */
+  .lab-grid{
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:36px;
+    align-items:start;
+    margin-top:26px;
+  }
+  @media (max-width:680px){ .lab-grid{ grid-template-columns:1fr; } }
+
+  .controls{ display:flex; flex-direction:column; gap:22px; }
+  .control{ display:flex; flex-direction:column; gap:7px; }
+  .control .row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .control label{ font-size:12.5px; font-weight:700; color:var(--ink); }
+  .control .val{ font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .control .hint{ font-size:11.5px; color:var(--muted); line-height:1.45; font-weight:300; }
+
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:1px;
+    background:var(--ink);
+    outline-offset:4px;
+    margin:10px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink);
+    cursor:pointer;
+    margin-top:0;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink); border:none; cursor:pointer;
+  }
+  input[type="range"]:focus-visible{ outline:2px solid var(--ink); }
+
+  .btn-row{ display:flex; flex-direction:column; gap:6px; }
+  .btn-line{ display:flex; gap:6px; align-items:stretch; }
+  .btn{
+    flex:1;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--ink);
+    border-radius:0;
+    padding:9px 16px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .btn:hover{ background:var(--ink); color:#fff; }
+  .btn:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+  .btn.secondary{ font-weight:300; }
+
+  .info-btn{
+    flex:none;
+    width:30px;
+    font:inherit;
+    font-size:12px;
+    font-weight:700;
+    font-style:italic;
+    color:var(--ink-2);
+    background:#fff;
+    border:1px solid var(--hair);
+    border-radius:0;
+    cursor:pointer;
+  }
+  .info-btn:hover{ border-color:var(--ink); color:var(--ink); }
+  .info-btn[aria-expanded="true"]{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .info-btn:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+  .btn-hint{ font-size:11.5px; color:var(--ink-2); line-height:1.45; font-weight:300; margin:-2px 0 2px; }
+
+  .legend{
+    display:flex; flex-direction:column; gap:9px;
+    margin-top:8px;
+    padding-top:18px;
+    border-top:1px solid var(--hair);
+  }
+  .legend-item{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-2); font-weight:300; }
+  .mark{ flex:none; }
+  .mark.line{ width:18px; height:0; border-top:2.5px solid var(--ink); }
+  .mark.dash{ width:18px; height:0; border-top:2px dashed var(--ink); }
+  .mark.sq{ width:8px; height:8px; border:1.5px solid var(--ink); background:#fff; }
+  .mark.dash-thin{ width:18px; height:0; border-top:1.5px dashed rgba(0,0,0,0.4); }
+
+  .chart-wrap{ display:flex; flex-direction:column; gap:2px; }
+  #chart{ width:100%; height:auto; display:block; }
+  .axis-caption{ text-align:center; font-size:11px; color:var(--muted); margin-top:4px; font-weight:300; }
+  .chart-note{ font-size:12.5px; color:var(--ink-2); line-height:1.55; font-weight:300; margin:14px 0 0; }
+
+  /* ---------- compare row (stat tiles, no equation) ---------- */
+  .compare-row{
+    margin-top:26px;
+    padding-top:16px;
+    border-top:1px solid var(--ink);
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+  }
+  @media (max-width:560px){ .compare-row{ flex-direction:column; gap:16px; } }
+  .stat-tile{ flex:1; display:flex; flex-direction:column; gap:5px; }
+  .stat-tile + .stat-tile{ border-left:1px solid var(--hair); padding-left:20px; margin-left:20px; }
+  @media (max-width:560px){ .stat-tile + .stat-tile{ border-left:none; padding-left:0; margin-left:0; } }
+  .stat-tile .stat-label{ font-size:12px; color:var(--ink); font-weight:700; }
+  .stat-tile .stat-value{ font-size:clamp(22px,3vw,27px); font-weight:700; }
+  .stat-tile .stat-sub{ font-size:11.5px; color:var(--ink-2); line-height:1.4; font-weight:300; }
+
+  /* ---------- coverage grids ---------- */
+  .coverage-wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:36px;
+    margin-top:26px;
+  }
+  @media (max-width:600px){ .coverage-wrap{ grid-template-columns:1fr; gap:28px; } }
+  .coverage-col h3{ margin:0 0 4px; font-size:14px; font-weight:700; }
+  .coverage-col .cov-count{ margin:0 0 12px; font-size:12px; color:var(--ink-2); font-weight:300; }
+  .cov-grid{ display:flex; flex-direction:column; gap:3px; overflow-x:auto; }
+  .cov-row{ display:flex; gap:3px; }
+  .cov-cell{ width:16px; height:16px; flex:none; border:1px solid var(--hair); background:#fff; }
+  .cov-cell.on{ background:var(--ink); border-color:var(--ink); }
+  .cov-axis{ font-size:10px; color:var(--muted); margin-top:4px; }
+
+  /* ---------- data table ---------- */
+  details{ margin-top:4px; }
+  summary{
+    cursor:pointer;
+    list-style:none;
+    padding:0 0 4px;
+    font-size:14px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--ink);
+  }
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; font-weight:300; color:var(--ink-2); font-size:18px; }
+  details[open] summary::after{ content:"\2013"; }
+  summary:focus-visible{ outline:2px solid var(--ink); }
+  .table-wrap{ overflow-x:auto; padding-top:14px; }
+  table{ border-collapse:collapse; width:100%; min-width:460px; font-size:13.5px; }
+  th, td{ text-align:right; padding:6px 10px; font-variant-numeric:tabular-nums; font-weight:300; }
+  th:first-child, td:first-child{ text-align:left; }
+  th:nth-child(2), td:nth-child(2){ text-align:left; }
+  thead th{ color:var(--ink-2); font-weight:700; font-size:11px; border-bottom:1px solid var(--ink); }
+  tbody td{ border-bottom:1px solid var(--hair); color:var(--ink-2); }
+  tbody tr.in-best td{ color:var(--ink); font-weight:700; }
+  tbody tr.in-diverse td{ color:var(--ink); }
+
+  /* ---------- takeaways ---------- */
+  .takeaways{ display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:22px; }
+  @media (max-width:600px){ .takeaways{ grid-template-columns:1fr; gap:24px; } }
+  .takeaway{ padding-top:14px; border-top:1px solid var(--ink); }
+  .takeaway h3{ margin:0 0 8px; font-size:16px; font-weight:700; }
+  .takeaway p{ margin:0; font-size:14px; line-height:1.62; color:var(--ink-2); font-weight:300; }
+
+  footer{
+    padding:26px 40px 40px;
+    display:flex; flex-direction:column; gap:5px;
+  }
+  footer p{ margin:0; font-size:11.5px; line-height:1.6; color:var(--muted); font-weight:300; }
+
+  /* ---------- caveat / alert box ---------- */
+  .caveat{ margin:4px 0 0; border:1px solid var(--hair); background:#F2F2F2; }
+  .caveat > summary{
+    cursor:pointer;
+    list-style:none;
+    padding:12px 16px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border-bottom:1px solid transparent;
+  }
+  .caveat > summary::-webkit-details-marker{ display:none; }
+  .caveat > summary::before{ content:"!"; font-style:italic; font-weight:700; color:var(--ink-2); margin-right:2px; }
+  .caveat > summary::after{ content:"+"; font-weight:300; color:var(--ink-2); font-size:18px; line-height:1; }
+  .caveat[open] > summary{ border-bottom-color:var(--muted); }
+  .caveat[open] > summary::after{ content:"\2013"; }
+  .caveat > summary:focus-visible{ outline:2px solid var(--ink); outline-offset:-2px; }
+  .caveat .caveat-body{ padding:14px 16px 16px; }
+  .caveat .caveat-body p{
+    margin:0 0 10px;
+    max-width:64ch;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+  .caveat .caveat-body p:last-child{ margin-bottom:0; }
+  .caveat .caveat-body p b{ color:var(--ink); }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <h1>Diversity trumps ability</h1>
+    <p class="thesis">A random team of varied problem-solvers can out-search a team of the individually best problem-solvers.</p>
+    <p class="hero-note">Hong and Page (2004) show &mdash; through computer simulations &mdash; that this is a probabilistic tendency that holds under specific conditions: 
+      the problem has to be hard, 
+      the pool of possible problem-solvers has to be large and diverse, 
+      and the individuals need to be reasonably competent to begin with. 
+      Simulate some trials below and watch how often it holds.</p>
+
+    <details class="caveat">
+      <summary>How this demo differs from Hong and Page (2004)</summary>
+      <div class="caveat-body">
+        <p><b>What matches the study.</b> The random team is drawn from the whole pool of pizza makers, with the best ones left in, so a top maker can still land on the random team by luck. Both teams work the same way: members take turns, and anyone who can find a topping change that improves the pizza makes it, until no one on the team can do any better. A maker&rsquo;s skill is measured by how good a pizza they tend to reach on their own, tried from many different random starting pizzas.</p>
+        <p><b>What is simplified.</b> The pizza kitchen stands in for the kind of genuinely hard problem the study used (a standard one from the research literature; Kauffman &amp; Weinberger, 1989). Ours is deliberately small so it runs instantly: 16 toppings, 60 makers to choose from, and teams of 3 to 8, where the study used far larger numbers. Here each maker simply has a fixed set of toppings they are allowed to change; in the study, people also differ in how they size up the problem and which changes they try, not just which parts they can touch. And the win rate is a running tally over many repeated trials rather than a single contest: the best team stays fixed for a given landscape (kitchen), while the random team is reshuffled each trial.</p>
+      </div>
+    </details>
+  </header>
+
+  <section class="history">
+    <p>Imagine you are making a pizza with 16 possible toppings, and for each one you decide: add the topping or leave the topping off. A topping's contribution to the pizza's overall taste doesn't stand alone; it depends on which other toppings are also on the pizza. Pineapple with ham might taste great, but pineapple with anchovies, less so. 
+      Whether the toppings' contributions are sensititve to the presence of other toppings depends on <i>K</i>. When <i>K</i> is small, a topping's flavor barely depends on the rest of the pizza, so good combinations are easier to find &mdash; just add the toppings that independently taste good and the pizza keeps getting better, like walking up a single smooth hill. 
+      When <i>K</i> is large, almost every topping's flavor swings depending on the rest of the combination, and the solutuion space fills with false peaks. For instance, you might start making a very good pizza, but then swapping just one topping makes it inedible.</p>
+    <p>Each problem-solver (pizza maker) below has a few of the 16 possible toppings to work with (controlled by the <i>m</i> slider), but no one has time to taste-test every possible pizza. 
+      A team pools whatever its members can each try: at every step, whoever can find a swap (i.e., add a topping) that improves the pizza makes it, until nobody can improve it any further.</p>
+    <span class="cite">Kauffman, S. A., &amp; Weinberger, E. D. (1989). The NK model of rugged fitness landscapes and its application to maturation of the immune response. <em>Journal of Theoretical Biology</em>, 141(2), 211&ndash;245.</span>
+  </section>
+
+  <section class="lab" id="lab">
+    <div class="section-head">
+      <h2>Explore the search</h2>
+      <p>A team of the five individually best problem-solvers (measured solo, on this pizza) versus five random problem-solvers, composing from the same starting pizza.</p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="controls">
+        <div class="control">
+          <div class="row"><label for="kSlider">Ruggedness (K)</label><span class="val" id="kVal">6</span></div>
+          <input type="range" id="kSlider" min="2" max="10" step="1" value="6">
+          <p class="hint">How many other decisions each one interacts with. Higher K means more false peaks.</p>
+        </div>
+        <div class="control">
+          <div class="row"><label for="mSlider">Perspective size (m)</label><span class="val" id="mVal">2</span></div>
+          <input type="range" id="mSlider" min="2" max="4" step="1" value="2">
+          <p class="hint">How many of the 16 toppings each solver can personally adjust.</p>
+        </div>
+        <div class="control">
+          <div class="row"><label for="tSlider">Team size</label><span class="val" id="tVal">5</span></div>
+          <input type="range" id="tSlider" min="3" max="8" step="1" value="5">
+          <p class="hint">How many solvers make up each team.</p>
+        </div>
+        <div class="btn-row">
+          <div class="btn-line">
+            <button id="newLandscape" class="btn" type="button">New landscape</button>
+            <button class="info-btn" type="button" aria-expanded="false" aria-controls="hintNewLandscape">i</button>
+          </div>
+          <p class="btn-hint" id="hintNewLandscape" hidden>Resets the pizza kitchen &mdash; new toppings, new interactions, a new pool of problem-solvers (pizza makers).</p>
+
+          <div class="btn-line">
+            <button id="runTrial" class="btn secondary" type="button">Run another trial</button>
+            <button class="info-btn" type="button" aria-expanded="false" aria-controls="hintRunTrial">i</button>
+          </div>
+          <p class="btn-hint" id="hintRunTrial" hidden>Keeps this same kitchen and pool, and restarts both teams from a new random starting pizza.</p>
+
+          <div class="btn-line">
+            <button id="runBatch" class="btn secondary" type="button">Run 10 more trials</button>
+            <button class="info-btn" type="button" aria-expanded="false" aria-controls="hintRunBatch">i</button>
+          </div>
+          <p class="btn-hint" id="hintRunBatch" hidden>Runs ten trials back to back on this same kitchen, so the win-rate tally below builds up quickly.</p>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="mark line"></span>Best team&rsquo;s search</div>
+          <div class="legend-item"><span class="mark dash"></span>Diverse team&rsquo;s search</div>
+          <div class="legend-item"><span class="mark dash-thin"></span>Best possible pizza</div>
+          <div class="legend-item"><span class="mark sq"></span>Start</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="chart" role="img" aria-label="Pizza quality after each improving swap, for the best team and the diverse team, both starting from the same pizza"></canvas>
+        <p class="axis-caption">Each swap a team makes &rarr;</p>
+        <p class="chart-note">A flat stretch means the team is stuck &mdash; nobody left on it can find a swap that helps. A step up means someone just found one. Whichever line keeps stepping up for longer usually ends up higher, even if it isn&rsquo;t the line that jumped first.</p>
+      </div>
+    </div>
+
+    <div class="compare-row" aria-live="polite">
+      <div class="stat-tile">
+        <span class="stat-label">Best team, this trial</span>
+        <span class="stat-value" id="statBest">0</span>
+        <span class="stat-sub">Score out of 100, where 100 is the best possible pizza.</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Diverse team, this trial</span>
+        <span class="stat-value" id="statDiverse">0</span>
+        <span class="stat-sub">Same landscape, same starting point, five random solvers.</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Trials so far</span>
+        <span class="stat-value" id="statTally">0 / 0</span>
+        <span class="stat-sub" id="statTallySub">Diverse team win rate on this landscape.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="coverage">
+    <div class="section-head">
+      <h2>Why the best team sees less</h2>
+      <p>Each row below is one problem-solver (pizza maker); each column is one of the 16 toppings; a filled square means that solver can adjust that topping. The best individuals are often good for the same reasons &mdash; so their toolboxes overlap, and the team collectively sees less of the pizza than five random problem-solvers would.</p>
+    </div>
+    <div class="coverage-wrap">
+      <div class="coverage-col">
+        <h3>Best team</h3>
+        <p class="cov-count" id="covBestCount">Covers 0 of 16 toppings</p>
+        <div class="cov-grid" id="covBestGrid"></div>
+      </div>
+      <div class="coverage-col">
+        <h3>Diverse team</h3>
+        <p class="cov-count" id="covDiverseCount">Covers 0 of 16 toppings</p>
+        <div class="cov-grid" id="covDiverseGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="data-disclosure">
+    <details>
+      <summary>View the full pool of solvers<span></span></summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rank</th><th>Toolbox (toppings)</th><th>Solo ability</th><th>On a team?</th></tr></thead>
+          <tbody id="poolBody"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section class="takeaways">
+    <div class="takeaway">
+      <h3>Ability doesn&rsquo;t add up the way you&rsquo;d think</h3>
+      <p>Picking the best individuals doesn&rsquo;t maximize what the group can collectively see, because the traits (toppings at one's disposal) that make someone an individually good problem-solver (pizza maker) tend to make them good for similar reasons, and similar reasons mean overlapping toolboxes.</p>
+    </div>
+    <div class="takeaway">
+      <h3>This is a tendency, not a guarantee</h3>
+      <p>Hong and Page's result needs a hard enough problem, a large and varied pool to draw from, and individuals who are competent enough to begin with (notice that the lowest solo ability is > 50). 
+        Push perspective size (m) up toward the whole problem and the advantage shrinks, because everyone starts to see everything anyway (i.e., everyone has access to all toppings).</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>References.</p>
+    <p>Hong, L., &amp; Page, S. E. (2004). Groups of diverse problem solvers can outperform groups of high-ability problem solvers. <em>Proceedings of the National Academy of Sciences</em>, 101(46), 16385&ndash;16389. &middot; Kauffman, S. A., &amp; Weinberger, E. D. (1989). The NK model of rugged fitness landscapes and its application to maturation of the immune response. <em>Journal of Theoretical Biology</em>, 141(2), 211&ndash;245.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const N = 16;
+  const P = 60;                // pool size
+  const S_ABILITY = 5;         // starts averaged to score each solver's solo ability
+  const MIN_DISPLAY_STEPS = 12; // chart always shows at least this many steps, so a team that
+                                 // plateaus early reads as a long flat line, not a short one
+  const TOTAL = 1 << N;
+
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function shuffle(arr, rng){
+    for(let a=arr.length-1; a>0; a--){
+      const b = Math.floor(rng()*(a+1));
+      const tmp=arr[a]; arr[a]=arr[b]; arr[b]=tmp;
+    }
+    return arr;
+  }
+  function popcount(x){ let c=0; while(x){ x&=x-1; c++; } return c; }
+
+  let rng, K, m, teamSize;
+  let neighbors, tables;
+  let fitArr, minFit, maxFit, globalGeno;
+  let pool, sortedPool, bestTeam;
+  let tally = { diverse:0, best:0, ties:0, total:0 };
+  let lastTrial = null;
+
+  function fitness(g){
+    let sum = 0;
+    for(let i=0;i<N;i++){
+      let idx = (g>>i)&1;
+      const nb = neighbors[i];
+      for(let j=0;j<nb.length;j++) idx = (idx<<1) | ((g>>nb[j])&1);
+      sum += tables[i][idx];
+    }
+    return sum/N;
+  }
+
+  function buildLandscape(){
+    neighbors = [];
+    for(let i=0;i<N;i++){
+      const others = [];
+      for(let j=0;j<N;j++) if(j!==i) others.push(j);
+      shuffle(others, rng);
+      neighbors.push(others.slice(0,K).sort((a,b)=>a-b));
+    }
+    tables = neighbors.map(()=>{
+      const size = 1 << (K+1);
+      const t = new Float64Array(size);
+      for(let s=0;s<size;s++) t[s]=rng();
+      return t;
+    });
+  }
+
+  function enumerateLandscape(){
+    fitArr = new Float32Array(TOTAL);
+    minFit = Infinity; maxFit = -Infinity; globalGeno = 0;
+    for(let g=0; g<TOTAL; g++){
+      const f = fitness(g);
+      fitArr[g] = f;
+      if(f < minFit) minFit = f;
+      if(f > maxFit){ maxFit = f; globalGeno = g; }
+    }
+  }
+
+  function scoreOf(f){ return (f-minFit)/(maxFit-minFit) * 100; }
+
+  function randomToolbox(){
+    const idxs = [];
+    for(let i=0;i<N;i++) idxs.push(i);
+    shuffle(idxs, rng);
+    return idxs.slice(0,m).sort((a,b)=>a-b);
+  }
+
+  function relaySearch(start, toolboxes){
+    let g = start;
+    const path = [g];
+    let guard = 0;
+    while(guard++ < 400){
+      let improvedAny = false;
+      for(const tb of toolboxes){
+        let bestFit = fitArr[g];
+        let bestFlip = -1;
+        for(const idx of tb){
+          const cand = g ^ (1<<idx);
+          const f = fitArr[cand];
+          if(f > bestFit){ bestFit = f; bestFlip = idx; }
+        }
+        if(bestFlip !== -1){ g = g ^ (1<<bestFlip); path.push(g); improvedAny = true; }
+      }
+      if(!improvedAny) break;
+    }
+    return { finalGenotype:g, finalFitness:fitArr[g], path };
+  }
+
+  let abilityStarts;
+  function buildPoolAndAbility(){
+    pool = [];
+    for(let p=0;p<P;p++) pool.push(randomToolbox());
+    abilityStarts = [];
+    for(let s=0;s<S_ABILITY;s++) abilityStarts.push(Math.floor(rng()*TOTAL));
+    const scored = pool.map(tb=>{
+      let sum=0;
+      for(const st of abilityStarts) sum += relaySearch(st, [tb]).finalFitness;
+      return { tb, ability: sum/S_ABILITY };
+    });
+    scored.sort((a,b)=>b.ability-a.ability);
+    sortedPool = scored;
+  }
+
+  function reformTeams(){
+    bestTeam = sortedPool.slice(0, teamSize);
+    tally = { diverse:0, best:0, ties:0, total:0 };
+  }
+
+  function doTrial(){
+    const start = Math.floor(rng()*TOTAL);
+    const poolCopy = sortedPool.slice();
+    shuffle(poolCopy, rng);
+    const diverseTeam = poolCopy.slice(0, teamSize);
+
+    const bestResult = relaySearch(start, bestTeam.map(s=>s.tb));
+    const diverseResult = relaySearch(start, diverseTeam.map(s=>s.tb));
+
+    tally.total++;
+    if(diverseResult.finalFitness > bestResult.finalFitness + 1e-9) tally.diverse++;
+    else if(bestResult.finalFitness > diverseResult.finalFitness + 1e-9) tally.best++;
+    else tally.ties++;
+
+    lastTrial = { start, bestResult, diverseResult, diverseTeam };
+  }
+
+  // ---------------- rendering ----------------
+  const chart = document.getElementById('chart');
+  const PAD_L = 44, PAD_R = 16, PAD_T = 20, PAD_B = 36;
+
+  function sizeCanvas(cv, cssW, cssH){
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(cssW*dpr);
+    cv.height = Math.round(cssH*dpr);
+    cv.style.width = cssW+'px';
+    cv.style.height = cssH+'px';
+    const c = cv.getContext('2d');
+    c.setTransform(dpr,0,0,dpr,0,0);
+    return c;
+  }
+
+  function yOf(cssH, score){ return PAD_T + (cssH-PAD_T-PAD_B) - (score/100)*(cssH-PAD_T-PAD_B); }
+
+  function drawAxes(c, cssW, cssH, maxSteps){
+    const plotW = cssW-PAD_L-PAD_R, plotH = cssH-PAD_T-PAD_B;
+    const xOf = (step) => PAD_L + (maxSteps===0 ? 0 : step/maxSteps) * plotW;
+
+    c.fillStyle = '#AEAEAE';
+    c.font = '11px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    [0,25,50,75,100].forEach(v=>{
+      const y = PAD_T + plotH - (v/100)*plotH;
+      c.fillText(v, PAD_L-8, y);
+      c.strokeStyle = '#E2E2E2'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(PAD_L, y); c.lineTo(PAD_L+plotW, y); c.stroke();
+    });
+
+    const xStep = Math.max(1, Math.ceil(maxSteps/8));
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    for(let s=0; s<=maxSteps; s+=xStep) c.fillText(s, xOf(s), PAD_T+plotH+8);
+    if(maxSteps % xStep !== 0) c.fillText(maxSteps, xOf(maxSteps), PAD_T+plotH+8);
+
+    c.strokeStyle = '#000000'; c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(PAD_L, PAD_T+plotH); c.lineTo(PAD_L+plotW, PAD_T+plotH);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(PAD_L, PAD_T); c.lineTo(PAD_L, PAD_T+plotH);
+    c.stroke();
+
+    // ceiling reference: the best possible pizza, always score 100
+    c.strokeStyle = 'rgba(0,0,0,0.4)'; c.lineWidth = 1.5;
+    c.setLineDash([3,3]);
+    c.beginPath(); c.moveTo(PAD_L, yOf(cssH,100)); c.lineTo(PAD_L+plotW, yOf(cssH,100)); c.stroke();
+    c.setLineDash([]);
+    c.fillStyle = '#7F7F7F';
+    c.textAlign = 'right'; c.textBaseline = 'bottom';
+    c.fillText('Best possible pizza', PAD_L+plotW, yOf(cssH,100)-4);
+
+    c.save();
+    c.translate(14, PAD_T+plotH/2);
+    c.rotate(-Math.PI/2);
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('Pizza quality (score)', 0, 0);
+    c.restore();
+    return xOf;
+  }
+
+  function drawStepPath(c, path, xOf, cssH, maxSteps, dashed){
+    const scores = path.map(g => scoreOf(fitArr[g]));
+    while(scores.length <= maxSteps) scores.push(scores[scores.length-1]);
+
+    c.strokeStyle = '#000000';
+    c.lineWidth = dashed ? 2 : 2.6;
+    c.setLineDash(dashed ? [3,3] : []);
+    c.beginPath();
+    c.moveTo(xOf(0), yOf(cssH, scores[0]));
+    for(let i=0; i<maxSteps; i++){
+      c.lineTo(xOf(i+1), yOf(cssH, scores[i]));
+      c.lineTo(xOf(i+1), yOf(cssH, scores[i+1]));
+    }
+    c.stroke();
+    c.setLineDash([]);
+
+    c.fillStyle = '#000000';
+    path.forEach((g,i)=>{
+      const y = yOf(cssH, scoreOf(fitArr[g]));
+      c.beginPath(); c.arc(xOf(i), y, i===path.length-1 ? 3.8 : 2.4, 0, 7); c.fill();
+    });
+
+    return { x: xOf(maxSteps), y: yOf(cssH, scores[maxSteps]) };
+  }
+
+  function redrawChart(){
+    const cssW = chart.parentElement.clientWidth;
+    const cssH = Math.round(cssW * (340/640));
+    const c = sizeCanvas(chart, cssW, cssH);
+    c.clearRect(0,0,cssW,cssH);
+
+    if(!lastTrial){ drawAxes(c, cssW, cssH, 1); return; }
+
+    const maxSteps = Math.max(MIN_DISPLAY_STEPS, lastTrial.bestResult.path.length-1, lastTrial.diverseResult.path.length-1);
+    const xOf = drawAxes(c, cssW, cssH, maxSteps);
+
+    const bestEnd = drawStepPath(c, lastTrial.bestResult.path, xOf, cssH, maxSteps, false);
+    const divEnd = drawStepPath(c, lastTrial.diverseResult.path, xOf, cssH, maxSteps, true);
+
+    c.fillStyle = '#7F7F7F';
+    c.font = '11px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.textAlign = 'left'; c.textBaseline = 'bottom';
+    c.fillText('Start', xOf(0)+6, yOf(cssH, scoreOf(fitArr[lastTrial.start]))-6);
+
+    // keep the two end-labels from colliding if the scores land close together
+    let bestLabelY = bestEnd.y - 10, divLabelY = divEnd.y - 10;
+    if(Math.abs(bestLabelY - divLabelY) < 16){
+      if(bestEnd.y <= divEnd.y){ bestLabelY = bestEnd.y - 10; divLabelY = divEnd.y + 18; }
+      else { divLabelY = divEnd.y - 10; bestLabelY = bestEnd.y + 18; }
+    }
+    c.font = 'bold 12px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    c.fillStyle = '#000000';
+    c.textAlign = 'right'; c.textBaseline = 'alphabetic';
+    c.fillText('Best: '+Math.round(scoreOf(lastTrial.bestResult.finalFitness)), bestEnd.x-9, bestLabelY);
+    c.fillText('Diverse: '+Math.round(scoreOf(lastTrial.diverseResult.finalFitness)), divEnd.x-9, divLabelY);
+  }
+
+  function renderCoverage(){
+    function buildGrid(container, countEl, team){
+      container.innerHTML = '';
+      const covered = new Set();
+      team.forEach(({tb})=>{
+        const row = document.createElement('div');
+        row.className = 'cov-row';
+        for(let i=0;i<N;i++){
+          const cell = document.createElement('div');
+          cell.className = 'cov-cell' + (tb.includes(i) ? ' on' : '');
+          row.appendChild(cell);
+        }
+        container.appendChild(row);
+        tb.forEach(i=>covered.add(i));
+      });
+      countEl.textContent = 'Covers '+covered.size+' of '+N+' toppings';
+    }
+    buildGrid(document.getElementById('covBestGrid'), document.getElementById('covBestCount'), bestTeam);
+    buildGrid(document.getElementById('covDiverseGrid'), document.getElementById('covDiverseCount'), lastTrial ? lastTrial.diverseTeam : []);
+  }
+
+  function renderPoolTable(){
+    const body = document.getElementById('poolBody');
+    body.innerHTML = '';
+    const bestSet = new Set(bestTeam);
+    const diverseSet = new Set(lastTrial ? lastTrial.diverseTeam : []);
+    const frag = document.createDocumentFragment();
+    sortedPool.forEach((entry, i)=>{
+      const tr = document.createElement('tr');
+      const inBest = bestSet.has(entry);
+      const inDiverse = diverseSet.has(entry);
+      const classes = [];
+      if(inBest) classes.push('in-best');
+      if(inDiverse) classes.push('in-diverse');
+      if(classes.length) tr.className = classes.join(' ');
+      let membership = '—';
+      if(inBest && inDiverse) membership = 'Best team &amp; diverse team (this trial)';
+      else if(inBest) membership = 'Best team';
+      else if(inDiverse) membership = 'Diverse team (this trial)';
+      tr.innerHTML = '<td>'+(i+1)+'</td><td>'+entry.tb.join(', ')+'</td><td>'+Math.round(scoreOf(entry.ability))+'</td><td>'+membership+'</td>';
+      frag.appendChild(tr);
+    });
+    body.appendChild(frag);
+  }
+
+  function updateStats(){
+    document.getElementById('statBest').textContent = lastTrial ? Math.round(scoreOf(lastTrial.bestResult.finalFitness)) : '0';
+    document.getElementById('statDiverse').textContent = lastTrial ? Math.round(scoreOf(lastTrial.diverseResult.finalFitness)) : '0';
+    document.getElementById('statTally').textContent = tally.diverse + ' / ' + tally.total;
+    const pct = tally.total ? Math.round(100*tally.diverse/tally.total) : 0;
+    document.getElementById('statTallySub').textContent = 'Diverse team has won ' + pct + '% of trials on this landscape.';
+  }
+
+  function refreshUI(){
+    redrawChart();
+    updateStats();
+    renderCoverage();
+    renderPoolTable();
+  }
+
+  function fullRegenerate(){
+    rng = mulberry32((Date.now() ^ Math.floor(Math.random()*1e9)) >>> 0);
+    K = +document.getElementById('kSlider').value;
+    m = +document.getElementById('mSlider').value;
+    teamSize = +document.getElementById('tSlider').value;
+    buildLandscape();
+    enumerateLandscape();
+    buildPoolAndAbility();
+    reformTeams();
+    doTrial();
+    refreshUI();
+  }
+
+  document.getElementById('kSlider').addEventListener('input', function(){
+    document.getElementById('kVal').textContent = this.value;
+    fullRegenerate();
+  });
+  document.getElementById('mSlider').addEventListener('input', function(){
+    document.getElementById('mVal').textContent = this.value;
+    fullRegenerate();
+  });
+  document.getElementById('tSlider').addEventListener('input', function(){
+    document.getElementById('tVal').textContent = this.value;
+    teamSize = +this.value;
+    reformTeams();
+    doTrial();
+    refreshUI();
+  });
+  document.getElementById('newLandscape').addEventListener('click', fullRegenerate);
+  document.getElementById('runTrial').addEventListener('click', function(){
+    doTrial();
+    refreshUI();
+  });
+  document.getElementById('runBatch').addEventListener('click', function(){
+    for(let i=0;i<10;i++) doTrial();
+    refreshUI();
+  });
+
+  document.querySelectorAll('.info-btn').forEach(function(btn){
+    const hint = document.getElementById(btn.getAttribute('aria-controls'));
+    btn.addEventListener('click', function(){
+      hint.hidden = !hint.hidden;
+      btn.setAttribute('aria-expanded', hint.hidden ? 'false' : 'true');
+    });
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(redrawChart, 120);
+  });
+
+  fullRegenerate();
+})();
+</script>

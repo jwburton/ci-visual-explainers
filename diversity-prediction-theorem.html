@@ -1,0 +1,547 @@
+<!doctype html>
+<title>Diversity Prediction Theorem</title>
+<style>
+  :root{
+    --page:   #ffffff;
+    --ink:    #000000;
+    --ink-2:  #7F7F7F;
+    --muted:  #AEAEAE;
+    --hair:   #E2E2E2;
+    color-scheme: light;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--page);
+    color:var(--ink);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight:300;
+  }
+  b, strong{ font-weight:700; }
+
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- hero (minimal title) ---------- */
+  .hero{
+    padding:44px 40px 32px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .hero .kicker{ margin:0; font-size:13px; color:var(--ink-2); font-weight:300; }
+  .hero h1{
+    margin:0;
+    font-weight:700;
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.2;
+    letter-spacing:-.01em;
+    padding-bottom:16px;
+    border-bottom:2px solid var(--ink);
+  }
+  .thesis{
+    margin:2px 0 0;
+    font-size:clamp(16px,2.2vw,19px);
+    font-weight:300;
+    color:var(--ink);
+  }
+  .thesis .op{ color:var(--muted); padding:0 .35em; }
+  .notation{
+    margin:14px 0 0;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(19px,2.6vw,24px);
+    color:var(--ink);
+  }
+  .notation .op{ padding:0 .3em; }
+  .notation i{ font-style:italic; }
+  .notation .frac{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:.52em;
+    line-height:1.15;
+    margin:0 .15em;
+    transform:translateY(-.05em);
+  }
+  .notation .frac .num{ padding:0 .25em .08em; border-bottom:1.3px solid currentColor; }
+  .notation .frac .denom{ padding:.08em .25em 0; font-style:italic; }
+  .notation .sigma{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:.9;
+    margin:0 .1em;
+  }
+  .notation .sigma .lim{ font-size:.32em; font-style:italic; line-height:1.3; }
+  .notation .sigma .sym{ font-size:1.55em; line-height:.7; }
+  .notation-key{
+    margin:10px 0 0;
+    font-size:12px;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+  .notation-key i{ font-style:italic; }
+  .hero-note{
+    margin:12px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--ink-2);
+  }
+
+  /* ---------- generic section shell ---------- */
+  section{ padding:36px 40px; border-bottom:1px solid var(--hair); }
+  section:last-of-type{ border-bottom:none; }
+
+  .history p{
+    margin:0;
+    max-width:66ch;
+    font-size:16px;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .history .cite{ display:block; margin-top:10px; font-size:12.5px; color:var(--ink-2); }
+
+  .section-head{ margin-bottom:8px; }
+  .section-head h2{
+    margin:0 0 12px;
+    font-size:22px;
+    font-weight:700;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--ink);
+  }
+  .section-head p{
+    margin:14px 0 0;
+    max-width:64ch;
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-2);
+    font-weight:300;
+  }
+
+  /* ---------- lab ---------- */
+  .lab-grid{
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:36px;
+    align-items:start;
+    margin-top:26px;
+  }
+  @media (max-width:680px){ .lab-grid{ grid-template-columns:1fr; } }
+
+  .controls{ display:flex; flex-direction:column; gap:22px; }
+  .control{ display:flex; flex-direction:column; gap:7px; }
+  .control .row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .control label{ font-size:12.5px; font-weight:700; color:var(--ink); }
+  .control .val{ font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .control .hint{ font-size:11.5px; color:var(--muted); line-height:1.45; font-weight:300; }
+
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:1px;
+    background:var(--ink);
+    outline-offset:4px;
+    margin:10px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink);
+    cursor:pointer;
+    margin-top:0;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:0;
+    background:var(--ink); border:none; cursor:pointer;
+  }
+  input[type="range"]:focus-visible{ outline:2px solid var(--ink); }
+
+  #reseed{
+    margin-top:2px;
+    align-self:flex-start;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--ink);
+    border-radius:0;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  #reseed:hover{ background:var(--ink); color:#fff; }
+  #reseed:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+
+  .legend{
+    display:flex; flex-direction:column; gap:9px;
+    margin-top:8px;
+    padding-top:18px;
+    border-top:1px solid var(--hair);
+  }
+  .legend-item{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-2); font-weight:300; }
+  .mark{ flex:none; }
+  .mark.dot{ width:9px; height:9px; border-radius:50%; background:var(--ink); opacity:.55; }
+  .mark.line{ width:18px; height:0; border-top:2.5px solid var(--ink); }
+  .mark.dash{ width:18px; height:0; border-top:2px dashed var(--ink); }
+
+  .chart-wrap{ display:flex; flex-direction:column; gap:2px; }
+  #chart{ width:100%; height:auto; display:block; }
+  .axis-caption{ text-align:center; font-size:11px; color:var(--muted); margin-top:4px; font-weight:300; }
+
+  /* ---------- equation row (stat tiles doubling as the equation's terms) ---------- */
+  .eq-row{
+    margin-top:26px;
+    padding-top:16px;
+    border-top:1px solid var(--ink);
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+  }
+  @media (max-width:560px){ .eq-row{ flex-direction:column; gap:16px; } }
+  .stat-tile{ flex:1; display:flex; flex-direction:column; gap:5px; }
+  .stat-tile .stat-label{ font-size:12px; color:var(--ink); font-weight:700; }
+  .stat-tile .stat-value{ font-size:clamp(22px,3vw,27px); font-weight:700; }
+  .stat-tile .stat-sub{ font-size:11.5px; color:var(--ink-2); line-height:1.4; font-weight:300; }
+  .eq-op{
+    flex:none;
+    font-size:clamp(20px,3vw,26px);
+    font-weight:300;
+    color:var(--muted);
+    padding:0 16px;
+    margin-top:31px;
+    line-height:1;
+  }
+  @media (max-width:560px){ .eq-op{ margin-top:0; padding:0; } }
+
+  /* ---------- data table ---------- */
+  details{ margin-top:4px; }
+  summary{
+    cursor:pointer;
+    list-style:none;
+    padding:0 0 4px;
+    font-size:14px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--ink);
+  }
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:"+"; font-weight:300; color:var(--ink-2); font-size:18px; }
+  details[open] summary::after{ content:"\2013"; }
+  summary:focus-visible{ outline:2px solid var(--ink); }
+  .table-wrap{ overflow-x:auto; padding-top:14px; }
+  table{ border-collapse:collapse; width:100%; min-width:420px; font-size:13.5px; }
+  th, td{ text-align:right; padding:6px 10px; font-variant-numeric:tabular-nums; font-weight:300; }
+  th:first-child, td:first-child{ text-align:left; }
+  thead th{ color:var(--ink-2); font-weight:700; font-size:11px; border-bottom:1px solid var(--ink); }
+  tbody td{ border-bottom:1px solid var(--hair); color:var(--ink-2); }
+  tbody tr:first-child td{ color:var(--ink); }
+  tfoot td{ padding-top:10px; font-weight:700; color:var(--ink); border-top:2px solid var(--ink); border-bottom:none; }
+
+  /* ---------- takeaways ---------- */
+  .takeaways{ display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:22px; }
+  @media (max-width:600px){ .takeaways{ grid-template-columns:1fr; gap:24px; } }
+  .takeaway{ padding-top:14px; border-top:1px solid var(--ink); }
+  .takeaway h3{ margin:0 0 8px; font-size:16px; font-weight:700; }
+  .takeaway p{ margin:0; font-size:14px; line-height:1.62; color:var(--ink-2); font-weight:300; }
+
+  footer{
+    padding:26px 40px 40px;
+    display:flex; flex-direction:column; gap:5px;
+  }
+  footer p{ margin:0; font-size:11.5px; line-height:1.6; color:var(--muted); font-weight:300; }
+
+  @media (prefers-reduced-motion: reduce){
+    circle, line, path{ transition:none !important; }
+  }
+  circle.guess, .mean-line, .mean-label{ transition: all 160ms ease; }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <h1>Diversity prediction theorem</h1>
+    <p class="thesis">Collective error <span class="op">=</span> Average individual error <span class="op">&minus;</span> Diversity</p>
+    <p class="notation">
+      (<i>c</i> &minus; <i>&theta;</i>)&sup2;
+      <span class="op">=</span>
+      <span class="frac"><span class="num">1</span><span class="denom">n</span></span><span class="sigma"><span class="lim">n</span><span class="sym">&Sigma;</span><span class="lim">i=1</span></span>(<i>s<sub>i</sub></i> &minus; <i>&theta;</i>)&sup2;
+      <span class="op">&minus;</span>
+      <span class="frac"><span class="num">1</span><span class="denom">n</span></span><span class="sigma"><span class="lim">n</span><span class="sym">&Sigma;</span><span class="lim">i=1</span></span>(<i>s<sub>i</sub></i> &minus; <i>c</i>)&sup2;
+    </p>
+    <p class="notation-key"><i>s<sub>i</sub></i> = guess <i>i</i> &middot; <i>c</i> = crowd estimate &middot; <i>&theta;</i> = true value &middot; <i>n</i> = crowd size</p>
+    <p class="hero-note">An identity (i.e., an equation that's true for every value of the variables) presented by Scott&nbsp;Page in <em>The Difference</em> (2007). It holds exactly, for any crowd, on any question.</p>
+  </header>
+
+  <section class="history">
+    <p>In 1906, at the West of England Fat Stock and Poultry Exhibition in Plymouth, about 800 fairgoers each paid sixpence to guess the dressed weight of an ox, with the best guesser winning a prize. 
+      The statistician Francis Galton collected the tickets afterward. The ox weighed 1,198&nbsp;pounds and the crowd's average guess was 1,197&nbsp;pounds, off by just one pound and far closer to the true weight than the average guesser. The diversity prediction theorem is the algebra that shows why.</p>
+    <span class="cite">Galton, F. (1907). "Vox Populi." <em>Nature</em>, 75, 450&ndash;451.</span>
+  </section>
+
+  <section class="lab" id="lab">
+    <div class="section-head">
+      <h2>Run your own crowd</h2>
+      <p>Simulate a crowd of 100 people guessing the ox's true weight &mdash; 1,198&nbsp;lbs. Set how biased they are as a group and how much they disagree with each other.</p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="controls">
+        <div class="control">
+          <div class="row"><label for="biasSlider">Crowd bias</label><span class="val" id="biasVal">0 lbs</span></div>
+          <input type="range" id="biasSlider" min="-140" max="140" step="5" value="0">
+          <p class="hint">A blind spot everyone shares &mdash; say, the ox stands in tall grass and every guesser under-counts its legs.</p>
+        </div>
+        <div class="control">
+          <div class="row"><label for="spreadSlider">Diversity dial</label><span class="val" id="spreadVal">&plusmn;60 lbs</span></div>
+          <input type="range" id="spreadSlider" min="10" max="160" step="5" value="60">
+          <p class="hint">How much guessers disagree with each other, independent of the shared bias.</p>
+        </div>
+        <button id="reseed" type="button">Draw a new crowd</button>
+
+        <div class="legend">
+          <div class="legend-item"><span class="mark dot"></span>Individual guess</div>
+          <div class="legend-item"><span class="mark line"></span>Crowd average</div>
+          <div class="legend-item"><span class="mark dash"></span>True weight &mdash; 1,198 lbs</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <svg id="chart" viewBox="0 0 680 300" role="img" aria-label="Number line showing individual guesses, the crowd average, and the true weight"></svg>
+        <p class="axis-caption">Guessed weight (lbs)</p>
+      </div>
+    </div>
+
+    <div class="eq-row" aria-live="polite">
+      <div class="stat-tile">
+        <span class="stat-label">Collective error</span>
+        <span class="stat-value" id="statCE">0</span>
+        <span class="stat-sub">How wrong the crowd's average guess is. lbs&sup2;</span>
+      </div>
+      <div class="eq-op">=</div>
+      <div class="stat-tile">
+        <span class="stat-label">Average individual error</span>
+        <span class="stat-value" id="statAIE">0</span>
+        <span class="stat-sub">How wrong the typical guesser is, squared then averaged. lbs&sup2;</span>
+      </div>
+      <div class="eq-op">&minus;</div>
+      <div class="stat-tile">
+        <span class="stat-label">Diversity</span>
+        <span class="stat-value" id="statD">0</span>
+        <span class="stat-sub">How far guessers stray from the crowd average, on average. lbs&sup2;</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="data-disclosure">
+    <details>
+      <summary>View each guess and its error<span></span></summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Guess (lbs)</th><th>Individual error (lbs&sup2;)</th></tr></thead>
+          <tbody id="tableBody"></tbody>
+          <tfoot><tr><td>&mdash;</td><td>Average &rarr;</td><td id="tableAvg">0</td></tr></tfoot>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section class="takeaways">
+    <div class="takeaway">
+      <h3>Diversity always helps</h3>
+      <p>Holding a crowd's average skill fixed, the theorem says a more diverse crowd is always more accurate collectively &mdash; diversity is <em>subtracted</em> from average error to get collective error, and a squared distance can never be negative to subtract.</p>
+    </div>
+    <div class="takeaway">
+      <h3>It can't fix a shared blind spot</h3>
+      <p>Diversity only cancels out disagreement, not a mistake everyone makes in the same direction. Push the bias slider away from zero and watch collective error refuse to fall, no matter how spread out the guesses get.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>References.</p>
+    <p>Page, S. (2007). <em>The Difference: How the Power of Diversity Creates Better Groups, Firms, Schools, and Societies.</em> &middot; Galton, F. (1907). "Vox Populi." <em>Nature</em>, 75, 450&ndash;451.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const TRUTH = 1198;
+  const N = 100; // fixed crowd size
+  const DOMAIN = [550, 1850];
+
+  // ---- fixed pseudo-random pool (Box-Muller), reseedable ----
+  let Z = [];
+  function reseed(){
+    Z = [];
+    for(let i=0;i<N;i++){
+      let u=0,v=0;
+      while(u===0) u=Math.random();
+      while(v===0) v=Math.random();
+      Z.push(Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v));
+    }
+  }
+  reseed();
+
+  const biasSlider = document.getElementById('biasSlider');
+  const spreadSlider = document.getElementById('spreadSlider');
+  const biasVal = document.getElementById('biasVal');
+  const spreadVal = document.getElementById('spreadVal');
+  const chart = document.getElementById('chart');
+  const tableBody = document.getElementById('tableBody');
+  const tableAvg = document.getElementById('tableAvg');
+
+  const fmt0 = x => Math.round(x).toLocaleString('en-US');
+  const fmtSigned = x => (x>0?'+':'') + Math.round(x).toLocaleString('en-US');
+
+  function compute(){
+    const n = N;
+    const bias = +biasSlider.value;
+    const spread = +spreadSlider.value;
+    const guesses = [];
+    for(let i=0;i<n;i++) guesses.push(TRUTH + bias + spread*Z[i]);
+    const mean = guesses.reduce((a,b)=>a+b,0)/n;
+    const AIE = guesses.reduce((a,v)=>a+(v-TRUTH)*(v-TRUTH),0)/n;
+    const D   = guesses.reduce((a,v)=>a+(v-mean)*(v-mean),0)/n;
+    const CE  = (mean-TRUTH)*(mean-TRUTH);
+    return {n,bias,spread,guesses,mean,AIE,D,CE};
+  }
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    const e = document.createElementNS(svgNS, tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // ---- main beeswarm chart ----
+  const CW = 680, CH = 300;
+  const PAD_L = 20, PAD_R = 20, PLOT_TOP = 26, PLOT_H = 220;
+  const R = 4, MIN_DIST = 2*R + 1.6;
+  const MAX_LANES = Math.floor(PLOT_H / (2*R+2));
+
+  function xScale(v){
+    return PAD_L + (v-DOMAIN[0])/(DOMAIN[1]-DOMAIN[0]) * (CW-PAD_L-PAD_R);
+  }
+
+  function layoutSwarm(values){
+    const sorted = values.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+    const laneLastPx = [];
+    const laned = [];
+    sorted.forEach(({v,i})=>{
+      const px = xScale(v);
+      let lane = 0;
+      while(laneLastPx[lane] !== undefined && Math.abs(px-laneLastPx[lane]) < MIN_DIST){
+        lane++;
+      }
+      laneLastPx[lane] = px;
+      laned.push({v,i,px,lane});
+    });
+    return laned;
+  }
+
+  let chartBuilt = false;
+  let gridGroup, dotsGroup, truthLine, truthLabel, meanLine, meanLabel, axisGroup;
+
+  function buildChartSkeleton(){
+    chart.innerHTML = '';
+    gridGroup = el('g', {});
+    axisGroup = el('g', {});
+    dotsGroup = el('g', {});
+    chart.appendChild(gridGroup);
+    chart.appendChild(axisGroup);
+
+    // axis ticks
+    const ticks = [600,900,1200,1500,1800];
+    ticks.forEach(t=>{
+      const x = xScale(t);
+      gridGroup.appendChild(el('line', {x1:x,x2:x,y1:PLOT_TOP,y2:PLOT_TOP+PLOT_H, stroke:'#E2E2E2', 'stroke-width':1}));
+      const label = el('text', {x, y:PLOT_TOP+PLOT_H+18, 'text-anchor':'middle', fill:'#AEAEAE', 'font-size':11, 'font-family':'"Helvetica Neue", Helvetica, Arial, sans-serif'});
+      label.textContent = t.toLocaleString('en-US');
+      axisGroup.appendChild(label);
+    });
+    axisGroup.appendChild(el('line', {x1:PAD_L, x2:CW-PAD_R, y1:PLOT_TOP+PLOT_H, y2:PLOT_TOP+PLOT_H, stroke:'#000000', 'stroke-width':1}));
+
+    // truth (dashed, black)
+    truthLine = el('line', {x1:0,x2:0,y1:PLOT_TOP-8,y2:PLOT_TOP+PLOT_H, stroke:'#000000', 'stroke-width':2, 'stroke-dasharray':'2 4'});
+    chart.appendChild(truthLine);
+    truthLabel = el('text', {x:0, y:PLOT_TOP-12, 'text-anchor':'middle', fill:'#000000', 'font-size':11.5, 'font-weight':700, 'font-family':'"Helvetica Neue", Helvetica, Arial, sans-serif'});
+    truthLabel.textContent = 'True weight';
+    chart.appendChild(truthLabel);
+
+    // crowd mean (solid, black, heavier weight)
+    meanLine = el('line', {x1:0,x2:0,y1:PLOT_TOP-8,y2:PLOT_TOP+PLOT_H, stroke:'#000000', 'stroke-width':3});
+    meanLine.setAttribute('class','mean-line');
+    chart.appendChild(meanLine);
+    meanLabel = el('text', {x:0, y:PLOT_TOP+PLOT_H+34, 'text-anchor':'middle', fill:'#000000', 'font-size':11.5, 'font-weight':700, 'font-family':'"Helvetica Neue", Helvetica, Arial, sans-serif'});
+    meanLabel.setAttribute('class','mean-label');
+    chart.appendChild(meanLabel);
+
+    chart.appendChild(dotsGroup);
+    chartBuilt = true;
+  }
+
+  function renderChart(state){
+    if(!chartBuilt) buildChartSkeleton();
+    const laned = layoutSwarm(state.guesses);
+
+    // dots
+    while(dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+    laned.forEach(d=>{
+      const cycle = Math.floor(d.lane / MAX_LANES);
+      const realLane = d.lane % MAX_LANES;
+      const y = PLOT_TOP + PLOT_H - 6 - realLane*(2*R+2);
+      const opacity = Math.max(0.22, 0.55 - cycle*0.14);
+      const c = el('circle', {cx:d.px, cy:y, r:R, fill:'#000000', class:'guess', opacity, stroke:'#ffffff', 'stroke-width':1.5});
+      dotsGroup.appendChild(c);
+    });
+
+    const tx = xScale(TRUTH);
+    truthLine.setAttribute('x1', tx); truthLine.setAttribute('x2', tx);
+    truthLabel.setAttribute('x', tx);
+
+    const mx = xScale(state.mean);
+    meanLine.setAttribute('x1', mx); meanLine.setAttribute('x2', mx);
+    meanLabel.setAttribute('x', mx);
+    meanLabel.textContent = 'Crowd average: ' + fmt0(state.mean) + ' lbs';
+  }
+
+  function renderTable(state){
+    tableBody.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    state.guesses.forEach((g,i)=>{
+      const err = (g-TRUTH)*(g-TRUTH);
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+(i+1)+'</td><td>'+fmt0(g)+'</td><td>'+fmt0(err)+'</td>';
+      frag.appendChild(tr);
+    });
+    tableBody.appendChild(frag);
+    tableAvg.textContent = fmt0(state.AIE);
+  }
+
+  function renderAll(){
+    const state = compute();
+
+    biasVal.textContent = (state.bias===0 ? '0 lbs' : fmtSigned(state.bias) + ' lbs');
+    spreadVal.textContent = '±' + state.spread + ' lbs';
+
+    renderChart(state);
+    renderTable(state);
+
+    document.getElementById('statAIE').textContent = fmt0(state.AIE);
+    document.getElementById('statD').textContent = fmt0(state.D);
+    document.getElementById('statCE').textContent = fmt0(state.CE);
+  }
+
+  [biasSlider, spreadSlider].forEach(s => s.addEventListener('input', renderAll));
+  document.getElementById('reseed').addEventListener('click', () => { reseed(); renderAll(); });
+
+  renderAll();
+})();
+</script>
